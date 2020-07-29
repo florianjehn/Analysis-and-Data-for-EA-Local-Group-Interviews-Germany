@@ -9,12 +9,16 @@ import pandas as pd
 from matplotlib.ticker import MaxNLocator
 import seaborn as sns
 
+# Create the barplots for all categorical topics
 kinds = {"group_activities":"Activities", "group_contacts":"Contacts", "group_topics":"Topics", "support_needs":"Support Needs"}
 for key, val in kinds.items():
     activities = pd.read_csv(key + ".csv", sep=";", encoding="'latin-1'")
+
     ax = activities.sum().sort_values().plot(kind="barh", color="#0A6B7C", zorder=5)
+    # Add labels
     ax.set_title(val, alpha=0.7)
     ax.set_xlabel("Times Mentioned", alpha=0.7)
+    # Everything after this is just for layout. 
     ax.xaxis.grid(True, color="lightgrey")
     ax.tick_params(axis=u'both', which=u'both',length=0)
     for spine in ax.spines.values():
@@ -28,25 +32,31 @@ for key, val in kinds.items():
     plt.savefig(key+".png", dpi=200, bbox_inches="tight")
     plt.close()
 
-
+# Create the plots for the numerical topics
 meta = pd.read_csv("group_meta.csv", sep=";", encoding="'latin-1'")
 main = meta[['Number of core group members', 'Number of total group members',
        'Founding year', 
        'Meetings per month', 
        'CEA Funding']]
+main.columns = map(str.title, main.columns)
+
+
 
 fig, axes = plt.subplots(nrows=5)
 for ax, col in zip(axes, main.columns):
-    ax = sns.boxplot(x=col,data=main,color="steelblue", zorder=6,ax=ax)
+    ax = sns.swarmplot(x=col,data=main,color="#0A6B7C", zorder=6,ax=ax)
     plt.setp(ax.get_xticklabels(), alpha=0.7)
     plt.setp(ax.get_yticklabels(), alpha=0.7)
+    ax.set_title(col, alpha=0.7)    
+    ax.set_xlabel("")
+
 #    ax.xaxis.grid(True, color="lightgrey", zorder=0)
     ax.tick_params(axis=u'both', which=u'both',length=0)
     for spine in ax.spines.values():
             spine.set_color("grey")
             
             
-fig.set_size_inches(10,10)
+fig.set_size_inches(12,6)
 fig.tight_layout()
 plt.savefig("meta_1.png", dpi=200)
 plt.close()
